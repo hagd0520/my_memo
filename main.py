@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import Depends, FastAPI, HTTPException, Request
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
 from sqlalchemy.orm import Session, declarative_base
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.templating import Jinja2Templates
@@ -50,6 +50,7 @@ class Memo(Base):
     __tablename__ = "memo"
     
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
     title = Column(String(100))
     content = Column(String(1000))
     
@@ -110,30 +111,58 @@ async def logout(request: Request):
 
 # 메모 생성
 @app.post("/memos")
-async def create_memo(memo: MemoCreate, db: Session = Depends(get_db)):
-    new_memo = Memo(title=memo.title, content=memo.content)
+async def create_memo(request: Request, memo: MemoCreate, db: Session = Depends(get_db)):
+    username = request.session.get("username")
+    if not username:
+        raise HTTPException(status_code=401, detail="Not authorized")
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    new_memo = Memo(user_id=user.id, title=memo.title, content=memo.content)
     db.add(new_memo)
     db.commit()
     db.refresh(new_memo)
-    return {"id": new_memo.id, "title": new_memo.title, "content": new_memo.content}
+    return new_memo
 
 
+# 모든 메모 조회
 @app.get("/memos")
 async def list_memos(db: Session = Depends(get_db)):
     memos = db.query(Memo).all()
     return [{"id": memo.id, "title": memo.title, "content": memo.content} for memo in memos]
 
 
+# 본인 메모 조회
+@app.get("/memos/me")
+async def list_memos(request: Request, db: Session = Depends(get_db)):
+    username = request.session.get("username")
+    if not username:
+        raise HTTPException(status_code=401, detail="Not authorized")
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    memos = db.query(Memo).filter(Memo.user_id == user.id).all()
+    return templates.TemplateResponse("memos.html", {"request": request, "memos": memos})
+
+
+# 메모 수정
 @app.put("/memos/{memo_id}")
-async def update_memo(memo_id: int, memo: MemoUpdate, db: Session = Depends(get_db)):
-    db_memo = db.query(Memo).filter(Memo.id == memo_id).first()
+async def update_memo(request:Request, memo_id: int, memo: MemoUpdate, db: Session = Depends(get_db)):
+    username = request.session.get("username")
+    if not username:
+        raise HTTPException(status_code=401, detail="Not authorized")
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db_memo = db.query(Memo).filter(Memo.user_id == user.id, Memo.id == memo_id).first()
     if db_memo is None:
         return {"error": "Memo not found"}
 
-    if memo.title is not None:
+    if memo.title:
         db_memo.title = memo.title
     
-    if memo.content is not None:
+    if memo.content:
         db_memo.content = memo.content
     
     db.commit()
@@ -143,8 +172,14 @@ async def update_memo(memo_id: int, memo: MemoUpdate, db: Session = Depends(get_
 
 # 메모 삭제
 @app.delete("/memos/{memo_id}")
-async def delete_memo(memo_id:int, db: Session = Depends(get_db)):
-    db_memo = db.query(Memo).filter(Memo.id == memo_id).first()
+async def delete_memo(request: Request, memo_id:int, db: Session = Depends(get_db)):
+    username = request.session.get("username")
+    if not username:
+        raise HTTPException(status_code=401, detail="Not authorized")
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db_memo = db.query(Memo).filter(Memo.user_id == user.id, Memo.id == memo_id).first()
     
     if db_memo is None:
         return {"error": "Memo not found"}
