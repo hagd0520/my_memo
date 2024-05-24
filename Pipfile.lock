@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e10260788ebe724e7731488369a2f83b51a72412f06d46a2d52d82e9cc6b7304"
+            "sha256": "fdb29a0b27dad13bcce5a33be9df1d1a0d7c1a5a25f9b857a2c81771cd469e31"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,15 @@
         ]
     },
     "default": {
+        "aiomysql": {
+            "hashes": [
+                "sha256:558b9c26d580d08b8c5fd1be23c5231ce3aeff2dadad989540fee740253deb67",
+                "sha256:b7c26da0daf23a5ec5e0b133c03d20657276e4eae9b73e040b72787f6f6ade0a"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.7'",
+            "version": "==0.2.0"
+        },
         "annotated-types": {
             "hashes": [
                 "sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53",
@@ -31,6 +40,16 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==4.3.0"
+        },
+        "asyncio": {
+            "hashes": [
+                "sha256:83360ff8bc97980e4ff25c964c7bd3923d333d177aa4f7fb736b019f26c7cb41",
+                "sha256:b62c9157d36187eca799c378e572c969f0da87cd5fc42ca372d92cdb06e7e1de",
+                "sha256:c46a87b48213d7464f22d9a497b9eef8c1928b68320a2fa94240f969f6fec08c",
+                "sha256:c4d18b22701821de07bd6aea8b53d21449ec0ec5680645e5317062ea21817d2d"
+            ],
+            "index": "pypi",
+            "version": "==3.4.3"
         },
         "certifi": {
             "hashes": [
@@ -467,6 +486,15 @@
             ],
             "markers": "python_version >= '3.8'",
             "version": "==2.18.0"
+        },
+        "pymysql": {
+            "hashes": [
+                "sha256:4de15da4c61dc132f4fb9ab763063e693d521a80fd0e87943b9a453dd4c19d6c",
+                "sha256:e127611aaf2b417403c60bf4dc570124aeb4a57f5f37b8e95ae399a42f904cd0"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.7'",
+            "version": "==1.1.1"
         },
         "python-dotenv": {
             "hashes": [

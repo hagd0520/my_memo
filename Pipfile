@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 fastapi = "*"
 sqlalchemy = "*"
+pymysql = "*"
+asyncio = "*"
+aiomysql = "*"
 
 [dev-packages]
 
