@@ -9,6 +9,9 @@ sqlalchemy = "*"
 pymysql = "*"
 asyncio = "*"
 aiomysql = "*"
+passlib = "*"
+itsdangerous = "*"
+bcrypt = "*"
 
 [dev-packages]
 
