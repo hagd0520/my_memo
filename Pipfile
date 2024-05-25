@@ -12,6 +12,7 @@ aiomysql = "*"
 passlib = "*"
 itsdangerous = "*"
 bcrypt = "*"
+cryptography = "*"
 
 [dev-packages]
 

@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import Depends, FastAPI, HTTPException, Request
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from sqlalchemy import Column, ForeignKey, Integer, String, create_engine
+from sqlalchemy import Column, ForeignKey, Integer, String, create_engine, desc
 from sqlalchemy.orm import Session, declarative_base
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.templating import Jinja2Templates
@@ -142,8 +142,8 @@ async def list_memos(request: Request, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    memos = db.query(Memo).filter(Memo.user_id == user.id).all()
-    return templates.TemplateResponse("memos.html", {"request": request, "memos": memos})
+    memos = db.query(Memo).filter(Memo.user_id == user.id).order_by(desc(Memo.id)).all()
+    return templates.TemplateResponse("memos.html", {"request": request, "memos": memos, "username": username})
 
 
 # 메모 수정
